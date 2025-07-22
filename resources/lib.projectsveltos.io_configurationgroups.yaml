@@ -45,8 +45,9 @@ spec:
                 - Remove
                 type: string
               configurationItem:
-                description: ConfigurationItems represents a list of configurations
-                  to deploy
+                description: |-
+                  ConfigurationItems represents a list of configurations to deploy
+                  The order of items in this list determines deployment sequence
                 items:
                   properties:
                     contentRef:
@@ -102,6 +103,7 @@ spec:
                       type: string
                   type: object
                 type: array
+                x-kubernetes-list-type: atomic
               continueOnConflict:
                 default: false
                 description: |-
@@ -229,6 +231,20 @@ spec:
                   changed and the ConfigurationGroup needs to be updated accordingly.
                 format: byte
                 type: string
+              serviceAccountName:
+                description: |-
+                  ServiceAccountName is the name of the ServiceAccount to impersonate when applying
+                  the configuration. If empty, the default ServiceAccount for the Sveltos-applier
+                  will be used.
+                  The ServiceAccount must exist in the managed cluster.
+                type: string
+              serviceAccountNamespace:
+                description: |-
+                  ServiceAccountNamespace is the namespace of the ServiceAccount to impersonate when applying
+                  the configuration. If empty, the default namespace for the Sveltos-applier
+                  will be used (typically the same namespace where the Sveltos-applier is deployed).
+                  The ServiceAccount must exist in the managed cluster.
+                type: string
               sourceRef:
                 description: |-
                   SourceRef is the user facing Sveltos resource that caused this ConfigurationGroup to be
@@ -275,6 +291,17 @@ spec:
                     type: string
                 type: object
                 x-kubernetes-map-type: atomic
+              sourceStatus:
+                default: Active
+                description: |-
+                  SourceStatus indicates the lifecycle status of the source resource (e.g., ClusterSummary)
+                  that created this ConfigurationGroup. Valid values are "Active" and "Deleted".
+                  This field helps determine if the ConfigurationGroup was created by a source that is
+                  no longer present or in a different state.
+                enum:
+                - Active
+                - Deleted
+                type: string
               tier:
                 default: 100
                 description: |-
